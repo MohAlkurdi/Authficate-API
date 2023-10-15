@@ -80,4 +80,15 @@ class AuthController extends Controller
         // Return the response
         return response(['message' => 'User logged out successfully'], 200);
     }
+
+
+    public function user(Request $request)
+    {
+        // Return the response
+        $response = [
+            'user' => $request->user(),
+        ];
+
+        return response($response, 200);
+    }
 }

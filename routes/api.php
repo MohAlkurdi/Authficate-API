@@ -31,4 +31,5 @@ Route::get('/certificates/{certificateId}', [IntegrationController::class, 'sear
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/get-certificates', [IntegrationController::class, 'getCertificates']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get("/user", [AuthController::class, "user"]);
 });
