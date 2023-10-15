@@ -15,11 +15,11 @@ class IntegrationController extends Controller
             $userId = Auth::id();
 
             // Check if the user already has fetch the certificates in the user_certificates table
-            $existingCertificate = UserCertificate::where('user_id', $userId)->first();
+            $existingCertificate = UserCertificate::where('user_id', $userId)->get();
 
             if ($existingCertificate) {
                 return [
-                    'message' => 'User already has certificates.',
+                    'message' => 'User already has fetch certificates.',
                     'existing_certificate' => $existingCertificate,
                 ];
             }
