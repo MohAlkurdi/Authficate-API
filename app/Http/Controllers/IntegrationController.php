@@ -114,4 +114,26 @@ class IntegrationController extends Controller
             ];
         }
     }
+
+    public function getUserCertificatesByMemberId($memberId)
+    {
+        // Make an HTTP request to the first API to fetch user certificates
+        $firstApiResponse = Http::get('http://127.0.0.1:8000/api/user/certificates/' . $memberId);
+
+        // Make an HTTP request to the second API to fetch user certificates
+        $secondApiResponse = Http::get('http://127.0.0.1:8002/api/user/certificates/' . $memberId);
+
+        if ($firstApiResponse->successful() && $secondApiResponse->successful()) {
+            // Process the responses and merge the certificates
+            $firstApiCertificates = $firstApiResponse->json();
+            $secondApiCertificates = $secondApiResponse->json();
+
+            // Merge the certificates from both APIs
+            $mergedCertificates = array_merge_recursive($firstApiCertificates, $secondApiCertificates);
+
+            return response()->json(['certificates' => $mergedCertificates], 200);
+        } else {
+            return response()->json(['error' => 'Unable to fetch user certificates'], 500);
+        }
+    }
 }

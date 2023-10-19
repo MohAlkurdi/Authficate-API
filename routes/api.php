@@ -26,6 +26,7 @@ use App\Http\Controllers\UserController;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/certificates/{certificateId}', [IntegrationController::class, 'searchCertificate']);
+Route::get('/user/certificates/{memberId}', [IntegrationController::class, 'getUserCertificatesByMemberId']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
