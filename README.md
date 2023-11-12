@@ -41,16 +41,16 @@ git clone https://github.com/MohAlkurdi/Authficate-API.git
 cp .env.example .env
 ```
 
-3. Generate Application Key:
-
-```bash
-php artisan key:generate
-```
-
-4. Install Composer Dependencies:
+3. Install Composer Dependencies:
 
 ```bash
 composer install
+```
+
+4. Generate Application Key:
+
+```bash
+php artisan key:generate
 ```
 
 5. Run Database Migrations:
