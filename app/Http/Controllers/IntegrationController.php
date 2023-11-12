@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\UserCertificate;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
@@ -33,7 +33,7 @@ class IntegrationController extends Controller
                                 ->where('course_name', $certificate['course']['name'])
                                 ->first();
 
-                            if (!$existingRecord) {
+                            if (! $existingRecord) {
                                 UserCertificate::create([
                                     'user_id' => Auth::id(),
                                     'username' => Auth::user()->name,
@@ -64,14 +64,12 @@ class IntegrationController extends Controller
         }
     }
 
-
-
     public function getUserCourses($certificatesToken)
     {
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $certificatesToken,
-            ])->get('http://127.0.0.1:8000/api/user/courses');
+                'Authorization' => 'Bearer '.$certificatesToken,
+            ])->get('easelearnapi.mohalkurdi.com/api/user/courses');
 
             if ($response->successful()) {
                 return $response->json();
@@ -95,8 +93,7 @@ class IntegrationController extends Controller
     public function searchCertificate(string $certificateId)
     {
         try {
-            $response = Http::get('http://127.0.0.1:8000/api/certificate/' . $certificateId);
-
+            $response = Http::get('easelearnapi.mohalkurdi.com/api/certificate/'.$certificateId);
 
             if ($response->successful()) {
                 return $response->json();
@@ -115,13 +112,13 @@ class IntegrationController extends Controller
         }
     }
 
-    public function getUserCertificatesByMemberId($memberId)
+    public function getUserCertificatesByMemberIdd($memberId)
     {
         // Make an HTTP request to the first API to fetch user certificates
-        $firstApiResponse = Http::get('http://127.0.0.1:8000/api/user/certificates/' . $memberId);
+        $firstApiResponse = Http::get('easelearnapi.mohalkurdi.com/api/user/certificates/'.$memberId);
 
         // Make an HTTP request to the second API to fetch user certificates
-        $secondApiResponse = Http::get('http://127.0.0.1:8002/api/user/certificates/' . $memberId);
+        $secondApiResponse = Http::get('learnhubapi.mohalkurdi.com/api/user/certificates/'.$memberId);
 
         if ($firstApiResponse->successful() && $secondApiResponse->successful()) {
             // Process the responses and merge the certificates
@@ -134,6 +131,41 @@ class IntegrationController extends Controller
             return response()->json(['certificates' => $mergedCertificates], 200);
         } else {
             return response()->json(['error' => 'Unable to fetch user certificates'], 500);
+        }
+    }
+
+    public function getUserCertificatesByMemberId($memberId)
+    {
+        // Initialize variables to store certificates
+        $firstApiCertificates = [];
+        $secondApiCertificates = [];
+
+        // Make an HTTP request to the first API to fetch user certificates
+        $firstApiResponse = Http::get('easelearnapi.mohalkurdi.com/api/user/certificates/'.$memberId);
+
+        // Make an HTTP request to the second API to fetch user certificates
+        $secondApiResponse = Http::get('learnhubapi.mohalkurdi.com/api/user/certificates/'.$memberId);
+
+        if ($firstApiResponse->successful()) {
+            $firstApiCertificates = $firstApiResponse->json();
+        }
+
+        if ($secondApiResponse->successful()) {
+            $secondApiCertificates = $secondApiResponse->json();
+        }
+
+        // Check if there are certificates in both responses
+        if (! empty($firstApiCertificates) && ! empty($secondApiCertificates)) {
+            // Merge the certificates from both APIs
+            $mergedCertificates = array_merge_recursive($firstApiCertificates, $secondApiCertificates);
+
+            return response()->json(['certificates' => $mergedCertificates], 200);
+        } elseif (! empty($firstApiCertificates)) {
+            return response()->json(['certificates' => $firstApiCertificates], 200);
+        } elseif (! empty($secondApiCertificates)) {
+            return response()->json(['certificates' => $secondApiCertificates], 200);
+        } else {
+            return response()->json(['message' => 'No certificates found'], 200);
         }
     }
 }

@@ -17,7 +17,7 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string'
+            'password' => 'required|string',
         ]);
 
         // Create a user
@@ -25,13 +25,14 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             // Hash the password
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
         ]);
 
         // Create a token for the user
         // $token = $user->createToken('auth_token')->plainTextToken;
 
         $token = $user->createToken('auth_token', ['user_id' => $user->id])->plainTextToken;
+
         // Return the response
         return response(['message' => 'User registered successfully', 'user' => $user, 'token' => $token], 201);
     }
@@ -42,23 +43,23 @@ class AuthController extends Controller
         // Validate the request
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required|string'
+            'password' => 'required|string',
         ]);
 
         // Check if the user exists
         $user = User::where('email', $request->email)->first();
 
         // If the user doesn't exist, return an error
-        if (!$user) {
+        if (! $user) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.']
+                'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
         // If the user exists, check if the password is correct
-        if (!Hash::check($request->password, $user->password)) {
+        if (! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.']
+                'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
@@ -80,7 +81,6 @@ class AuthController extends Controller
         // Return the response
         return response(['message' => 'User logged out successfully'], 200);
     }
-
 
     public function user(Request $request)
     {
